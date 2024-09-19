@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your To-Do List</title>
+    <style>
+       
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #522b5b;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+       
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px; 
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        
+        input:focus, select:focus {
+            border-color: #007bff;
+        }
+
+        
+        button {
+            padding: 10px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%; 
+        }
+
+       
+        .complete-button {
+            background-color: #28a745;
+        }
+
+      
+        .complete-button:hover {
+            background-color: #218838;
+        }
+
+        
+        .remove-button {
+            background-color: #dc3545;
+        }
+
+       
+        .remove-button:hover {
+            background-color: #c82333;
+        }
+
+        
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+       
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        
+        .completed {
+            text-decoration: line-through;
+            color: grey;
+        }
+
+        
+        .button-group {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your To-Do List</h1>
+        <div>
+            <input type="text" id="taskInput" placeholder="What do you need to do?">
+            <select id="userSelect">
+                <option value="">Assign to user</option>
+                <option value="Alice">Alice</option>
+                <option value="Bob">Bob</option>
+                <option value="Charlie">Charlie</option>
+            </select>
+            <button id="addTaskButton">Add Task</button> 
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+    <script>
+       
+        const taskInput = document.getElementById('taskInput');
+        const userSelect = document.getElementById('userSelect');
+        const addTaskButton = document.getElementById('addTaskButton');
+        const taskList = document.getElementById('taskList');
+
+        
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        
+        function renderTasks() {
+            taskList.innerHTML = ''; 
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${task.text} (Assigned to: ${task.user})`; 
+                if (task.completed) {
+                    li.classList.add('completed'); 
+                }
+
+             
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'button-group';
+
+               
+                const completeButton = document.createElement('button');
+                completeButton.textContent = 'Complete';
+                completeButton.className = 'complete-button';
+                completeButton.onclick = () => {
+                    task.completed = !task.completed; 
+                    saveTasks();
+                    renderTasks(); 
+                };
+
+             
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.className = 'remove-button';
+                removeButton.onclick = () => {
+                    tasks.splice(index, 1);
+                    saveTasks();
+                    renderTasks(); 
+                };
+
+              
+                buttonGroup.appendChild(completeButton);
+                buttonGroup.appendChild(removeButton);
+                li.appendChild(buttonGroup);
+                taskList.appendChild(li);
+            });
+        }
+
+        
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        
+        addTaskButton.onclick = () => {
+            const taskText = taskInput.value;
+            const assignedUser = userSelect.value;
+            if (taskText && assignedUser) {
+                taskInput.value = ''; 
+                userSelect.value = '';
+                saveTasks();
+                renderTasks();
+            } else {
+                alert("Please enter a task and assign it to a user."); 
+            }
+        };
+
+        
+        renderTasks();
+    </script>
+</body>
+</html>
